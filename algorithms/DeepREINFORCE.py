@@ -31,7 +31,7 @@ def DeepREINFORCE(cfg, env_process, env_folder):
 
     fig_z = []
     fig_nav = []
-    debug = False
+    debug = True
     # Generate path where the weights will be saved
     cfg, algorithm_cfg = save_network_path(cfg=cfg, algorithm_cfg=algorithm_cfg)
     current_state = {}
