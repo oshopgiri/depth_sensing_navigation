@@ -12,6 +12,7 @@ from aux_functions import *
 import os
 from util.transformations import euler_from_quaternion
 from configs.read_cfg import read_cfg, update_algorithm_cfg
+import time
 
 
 def DeepREINFORCE(cfg, env_process, env_folder):
@@ -308,17 +309,20 @@ def DeepREINFORCE(cfg, env_process, env_folder):
                     agent_state = agent[name_agent].GetAgentState()
                     if agent_state.has_collided:
                         print('Drone collided')
-                        print("Total distance traveled: ", np.round(distance[name_agent], 2))
+                        total_distance = np.round(distance[name_agent], 2)
+                        print("Total distance traveled: ", total_distance)
                         active = False
                         client.moveByVelocityAsync(vx=0, vy=0, vz=0, duration=1, vehicle_name=name_agent).join()
 
                         if nav_x:  # Nav_x is empty if the drone collides in first iteration
                             ax_nav.plot(nav_x.pop(), nav_y.pop(), 'r*', linewidth=20)
+                        timestamp = int(time.time())
                         file_path = env_folder + 'results/'
-                        fig_z.savefig(file_path + 'altitude_variation.png', dpi=500)
-                        fig_nav.savefig(file_path + 'navigation.png', dpi=500)
-                        close_env(env_process)
+                        fig_z.savefig(file_path + 'altitude_variation' + str(timestamp) + '.png', dpi=500)
+                        fig_nav.savefig(file_path + 'navigation' + str(timestamp) + '.png', dpi=500)
+                        # close_env(env_process)
                         print('Figures saved')
+                        return total_distance
                     else:
                         posit[name_agent] = client.simGetVehiclePose(vehicle_name=name_agent)
                         distance[name_agent] = distance[name_agent] + np.linalg.norm(np.array(
