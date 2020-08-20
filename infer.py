@@ -7,6 +7,7 @@ from configs.read_cfg import read_cfg
 from main import generate_json
 import importlib
 import nvidia_smi
+import time
 
 if __name__ == "__main__":
     # Read the config file
@@ -20,18 +21,33 @@ if __name__ == "__main__":
     except:
         cfg.NVIDIA_GPU = False
     if can_proceed:
-        # Start the environment
-        env_process, env_folder = start_environment(env_name=cfg.env_name)
-
         # If mode != infer, don't initialize any algorithm
         if cfg.mode == 'infer':
-            total_distances = []
+            iterations = 100
+            total_distance = 0.0
+            max_distance_travelled = 0.0
+            mdt_iteration = -1
 
-            for i in range(1000):
-                algorithm = importlib.import_module('algorithms.' + cfg.algorithm)
-                name = 'algorithm.' + cfg.algorithm + '(cfg, env_process, env_folder)'
-                total_distances.append(eval(name))
+            for i in range(iterations):
+                try:
+                    # Start the environment
+                    env_process, env_folder = start_environment(env_name=cfg.env_name)
 
-            print(total_distances/1000)
+                    algorithm = importlib.import_module('algorithms.' + cfg.algorithm)
+                    name = 'algorithm.' + cfg.algorithm + '(cfg, env_process, env_folder)'
+                    distance_travelled = eval(name)
+
+                    total_distance += distance_travelled
+                    if(distance_travelled > max_distance_travelled):
+                        max_distance_travelled = distance_travelled
+                        mdt_iteration = i
+                    time.sleep(1)
+                except KeyboardInterrupt:
+                    raise
+                except:
+                    i -= 1
+
+            print(total_distance / iterations)
+            print(mdt_iteration)
         else:
             print('Please change the mode to \'infer\'')

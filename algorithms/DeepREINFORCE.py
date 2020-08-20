@@ -13,6 +13,7 @@ import os
 from util.transformations import euler_from_quaternion
 from configs.read_cfg import read_cfg, update_algorithm_cfg
 import time
+import matplotlib.pyplot as plt
 
 
 def DeepREINFORCE(cfg, env_process, env_folder):
@@ -318,9 +319,11 @@ def DeepREINFORCE(cfg, env_process, env_folder):
                             ax_nav.plot(nav_x.pop(), nav_y.pop(), 'r*', linewidth=20)
                         timestamp = int(time.time())
                         file_path = env_folder + 'results/'
-                        fig_z.savefig(file_path + 'altitude_variation' + str(timestamp) + '.png', dpi=500)
-                        fig_nav.savefig(file_path + 'navigation' + str(timestamp) + '.png', dpi=500)
-                        # close_env(env_process)
+                        fig_z.savefig(file_path + 'altitude_variation_' + str(timestamp) + '.png', dpi=500)
+                        plt.close(fig_z)
+                        fig_nav.savefig(file_path + 'navigation_' + str(timestamp) + '.png', dpi=500)
+                        plt.close(fig_nav)
+                        close_env(env_process)
                         print('Figures saved')
                         return total_distance
                     else:
